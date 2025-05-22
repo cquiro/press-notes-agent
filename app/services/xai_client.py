@@ -19,7 +19,7 @@ class XAIClient:
             raise ValueError("XAI_API_KEY must be set in .env")
         self.base_url = "https://api.x.ai"
 
-    async def extract_article_content(self, url: str, raw_content: str) -> dict:
+    async def extract_article_content(self, url: str, raw_content: str) -> ArticleContent:
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
@@ -45,8 +45,7 @@ class XAIClient:
                 try:
                     parsed = json.loads(extracted)
                     logger.info(f"Successfully parsed xAI response for {url}")
-                    article = ArticleContent(url=url, **parsed)
-                    return article.model_dump()
+                    return ArticleContent(url=url, **parsed)
                 except json.JSONDecodeError:
                     logger.error(f"Invalid JSON from xAI API for {url}: {extracted}")
                     return ArticleContent(url=url, title="Untitled", content=extracted)
