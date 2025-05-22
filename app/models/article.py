@@ -1,6 +1,5 @@
 from pydantic import BaseModel, HttpUrl, Field
-from pydantic.types import conlist
-from typing import List
+from typing import List, Union
 
 class ArticleRequest(BaseModel):
     urls: List[HttpUrl] = Field(..., max_length=10)
@@ -12,3 +11,10 @@ class ArticleContent(BaseModel):
 
 class ArticleResponse(BaseModel):
     articles: List[ArticleContent]
+
+class ArticleError(BaseModel):
+    url: str
+    error: str
+
+class ArticleExtractionResponse(BaseModel):
+    results: List[Union[ArticleContent, ArticleError]]
