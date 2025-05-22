@@ -5,6 +5,8 @@ import json
 import logging
 import os
 
+from app.models.article import ArticleContent
+
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,14 +25,13 @@ class XAIClient:
             "Content-Type": "application/json"
         }
         raw_content = raw_content[:10000]
-        prompt = f"""
-        Extract the main article content from the provided text. Remove ads, author bios, navigation menus, and other irrelevant sections. Return a JSON object with 'title' (the article title) and 'content' (the main body text). If no title is found, use a placeholder.
-
-        Raw content: {raw_content}
-        """
+        prompt = "Extract the main article content from the provided text. Remove ads, author bios, navigation menus, and other irrelevant sections. Return a JSON object with 'title' (the article title) and 'content' (the main body text). If no title is found, use a placeholder."
         payload = {
             "model": "grok-3",
-            "messages": [{"role": "user", "content": prompt}],
+            "messages": [
+                {"role": "user", "content": prompt},
+                {"role": "user", "content": raw_content}
+            ],
             "max_tokens": 2000
         }
 
@@ -44,10 +45,11 @@ class XAIClient:
                 try:
                     parsed = json.loads(extracted)
                     logger.info(f"Successfully parsed xAI response for {url}")
-                    return parsed
+                    article = ArticleContent(url=url, **parsed)
+                    return article.model_dump()
                 except json.JSONDecodeError:
                     logger.error(f"Invalid JSON from xAI API for {url}: {extracted}")
-                    return {"title": "Untitled", "content": extracted}
+                    return ArticleContent(url=url, title="Untitled", content=extracted)
             except httpx.HTTPStatusError as e:
                 logger.error(f"xAI API error for {url}: {e}")
                 raise Exception(f"xAI API error: {e}")
