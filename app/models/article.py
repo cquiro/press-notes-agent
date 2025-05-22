@@ -1,9 +1,9 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, Field
 from pydantic.types import conlist
-from typing import List, Annotated
+from typing import List
 
 class ArticleRequest(BaseModel):
-    urls: Annotated[List[HttpUrl], conlist(HttpUrl, max_items=10)]
+    urls: List[HttpUrl] = Field(..., max_length=10)
 
 class ArticleContent(BaseModel):
     url: str
