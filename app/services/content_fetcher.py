@@ -1,10 +1,21 @@
+from app.models.article import ArticleContent
+from app.services.xai_client import XAIClient
 import httpx
 
-async def fetch_raw_content(url: str) -> str:
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        try:
-            response = await client.get(url)
-            response.raise_for_status()
-            return response.text
-        except httpx.HTTPError as e:
-            raise RuntimeError(f"HTTP error while fetching {url}: {str(e)}")
+class ContentFetcher:
+    def __init__(self, xai_client: XAIClient):
+        self.xai_client = xai_client
+
+    async def fetch(self, url: str) -> ArticleContent:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            try:
+                response = await client.get(url)
+                response.raise_for_status
+                raw_content = response.text
+            except httpx.HTTPError as e:
+                raise RuntimeError(f"HTTP error fetching {url}: {e}")
+
+            try:
+                return await self.xai_client.extract_article_content(url, raw_content)
+            except Exception as e:
+                raise RuntimeError(f"xAI extraction failed for {url}: {e}")
