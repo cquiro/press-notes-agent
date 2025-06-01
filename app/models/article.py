@@ -9,9 +9,6 @@ class ArticleContent(BaseModel):
     title: str
     content: str
 
-class ArticleResponse(BaseModel):
-    articles: List[ArticleContent]
-
 class ArticleError(BaseModel):
     url: str
     error: str
