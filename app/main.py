@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from contextlib import asynccontextmanager
 from app.logging_config import setup_logging
 from app.models.article import ArticleRequest, ArticleError, ArticleExtractionResponse
@@ -7,8 +7,6 @@ from app.services.xai_client import XAIClient
 import asyncio
 
 setup_logging()
-
-xai_client = XAIClient()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -20,10 +18,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-content_fetcher = ContentFetcher(xai_client=xai_client)
-
 @app.post("/extract-content", response_model=ArticleExtractionResponse)
-async def extract_relevant_content(request: ArticleRequest):
+async def extract_relevant_content(request: ArticleRequest, req: Request):
+    content_fetcher: ContentFetcher = req.app.state.content_fetcher
+
     async def extract_with_error_handling(url):
         try:
             content = await content_fetcher.fetch(str(url))
