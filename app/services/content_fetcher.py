@@ -1,6 +1,6 @@
 from app.models.article import ArticleContent
 from app.services.xai_client import XAIClient
-from app.utils.html_cleaner import extract_readable_text
+from app.utils.html_cleaner import extract_readable_text_and_title
 import logging
 import httpx
 
@@ -11,17 +11,17 @@ class ContentFetcher:
         self.xai_client = xai_client
 
     async def fetch(self, url: str) -> ArticleContent:
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            try:
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
                 response = await client.get(url)
-                response.raise_for_status
+                response.raise_for_status()
                 raw_html = response.text
-                raw_content = extract_readable_text(raw_html)
-                return await self.xai_client.extract_article_content(url, raw_content)
-            except httpx.HTTPError as e:
-                raise RuntimeError(f"HTTP error fetching {url}: {e}")
+        except httpx.HTTPError as e:
+            raise RuntimeError(f"HTTP error fetching {url}: {e}")
+
+        raw_content, title = extract_readable_text_and_title(raw_html)
 
         try:
-            return await self.xai_client.extract_article_content(url, raw_content)
+            return await self.xai_client.extract_article_content(url, raw_content, title_hint=title)
         except Exception as e:
             raise RuntimeError(f"xAI extraction failed for {url}: {e}") from e
