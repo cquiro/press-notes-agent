@@ -50,7 +50,7 @@ class XAIClient:
             assert self.client is not None
             response = await self.client.post(f"{self.base_url}/v1/chat/completions", json=payload, headers=headers)
             response.raise_for_status()
-            result = await response.json()
+            result = response.json()
             extracted = result["choices"][0]["message"]["content"]
             try:
                 parsed = json.loads(extracted)
