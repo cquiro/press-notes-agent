@@ -21,9 +21,6 @@ class XAIClient:
         self.client: Optional[httpx.AsyncClient] = None
 
     async def extract_article_content(self, url: str, raw_content: str, title_hint: Optional[str] = None) -> ArticleContent:
-        with open("debug/raw_content.txt", "w") as f:
-            f.write(raw_content)
-
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"

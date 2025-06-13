@@ -1,10 +1,10 @@
 from fastapi import FastAPI, Request
 from contextlib import asynccontextmanager
 from app.logging_config import setup_logging
-from app.models.article import ArticleRequest, ArticleError, ArticleExtractionResponse
+from app.models.article import ArticleRequest, ArticleExtractionResponse
 from app.services.content_fetcher import ContentFetcher
 from app.services.xai_client import XAIClient
-import asyncio
+from app.services.press_notes_orchestrator import PressNotesOrchestrator
 
 setup_logging()
 
@@ -12,7 +12,8 @@ setup_logging()
 async def lifespan(app: FastAPI):
     xai_client = XAIClient()
     await xai_client.init()
-    app.state.content_fetcher = ContentFetcher(xai_client=xai_client)
+    content_fetcher = ContentFetcher(xai_client=xai_client)
+    app.state.orchestrator = PressNotesOrchestrator(content_fetcher=content_fetcher)
     yield
     await xai_client.close()
 
@@ -20,15 +21,10 @@ app = FastAPI(lifespan=lifespan)
 
 @app.post("/extract-content", response_model=ArticleExtractionResponse)
 async def extract_relevant_content(request: ArticleRequest, req: Request):
-    content_fetcher: ContentFetcher = req.app.state.content_fetcher
+    orchestrator: PressNotesOrchestrator = req.app.state.orchestrator
 
-    async def extract_with_error_handling(url):
-        try:
-            content = await content_fetcher.fetch(str(url))
-            return content
-        except Exception as e:
-            return ArticleError(url=str(url), error=str(e))
-
-    tasks = [extract_with_error_handling(url) for url in request.urls]
-    results = await asyncio.gather(*tasks)
-    return {"results": results}
+    articles, pdf_path = await orchestrator.build_press_notes([str(url) for url in request.urls])
+    return {
+        "results": articles,
+        "pdf_path": str(pdf_path)
+    }
