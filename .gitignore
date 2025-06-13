@@ -1,0 +1,48 @@
+# === PYTHON ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+.env
+.env.*
+
+# === VIRTUAL ENVIRONMENTS ===
+venv/
+.venv/
+
+# === FASTAPI OUTPUT ===
+output/
+
+# === IDEs & EDITORS ===
+.vscode/
+.idea/
+*.swp
+
+# === NODE / REACT FRONTEND ===
+frontend/node_modules/
+frontend/.env
+frontend/.next/
+frontend/build/
+frontend/dist/
+
+# === OS FILES ===
+.DS_Store
+Thumbs.db
+
+# === COVERAGE / TESTS ===
+htmlcov/
+.coverage
+.cache/
+pytest_cache/
+.tox/
+
+# === LOGS ===
+*.log
+*.bak
+*.tmp
+
+# === REPORTLAB (sometimes generates temp files) ===
+*.pdf~
+
