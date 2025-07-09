@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Press Notes Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold mb-4">Press Notes Generator</h1>
+        <div class="mb-4">
+            <label for="urls" class="block text-gray-700 text-sm font-bold mb-2">Enter URLs (up to 10):</label>
+            <textarea id="urls" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows="10"></textarea>
+        </div>
+        <button id="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            Generate Press Notes
+        </button>
+        <div id="loading" class="hidden mt-4">
+            <p>Generating press notes...</p>
+        </div>
+        <div id="results" class="mt-4"></div>
+    </div>
+    <script>
+        document.getElementById('submit').addEventListener('click', async () => {
+            const urls = document.getElementById('urls').value.split('\n').filter(url => url.trim() !== '');
+            if (urls.length === 0 || urls.length > 10) {
+                alert('Please enter between 1 and 10 URLs.');
+                return;
+            }
+
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('results').innerHTML = '';
+
+            const response = await fetch('/extract-content', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ urls })
+            });
+
+            document.getElementById('loading').classList.add('hidden');
+
+            if (response.ok) {
+                const data = await response.json();
+                const resultsDiv = document.getElementById('results');
+                let html = '<h2 class="text-2xl font-bold mb-2">Results</h2>';
+                
+                if (data.pdf_path) {
+                    const pdfFilename = data.pdf_path.split('/').pop();
+                    html += `<a href="/download/${pdfFilename}" class="text-blue-500 hover:underline" download>Download PDF</a>`;
+                }
+
+                data.results.forEach(result => {
+                    if (result.error) {
+                        html += `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                                    <strong class="font-bold">Error:</strong>
+                                    <span class="block sm:inline">${result.error} for ${result.url}</span>
+                                 </div>`;
+                    } else {
+                        html += `<div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+                                    <h3 class="text-xl font-bold mb-2">${result.title}</h3>
+                                    <p class="text-gray-700 text-base">${result.content.substring(0, 200)}...</p>
+                                 </div>`;
+                    }
+                });
+                resultsDiv.innerHTML = html;
+            } else {
+                alert('An error occurred.');
+            }
+        });
+    </script>
+</body>
+</html>
