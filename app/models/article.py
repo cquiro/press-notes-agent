@@ -15,3 +15,4 @@ class ArticleError(BaseModel):
 
 class ArticleExtractionResponse(BaseModel):
     results: List[Union[ArticleContent, ArticleError]]
+    pdf_path: str
