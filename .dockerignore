@@ -1,0 +1,14 @@
+# Git and cache files
+.git
+.gitignore
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Environment files
+.env
+
+# Application output
+output/

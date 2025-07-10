@@ -31,19 +31,54 @@ This project is a FastAPI application that automates the process of creating pre
     pip install -r requirements.txt
     ```
 
-### Running the Application
+### Configuration
 
-1.  **Start the backend server:**
+This application requires an API key for the xAI service. You must create a `.env` file in the root directory of the project (the same directory as `README.md`) and add your API key to it.
+
+Create a file named `.env` with the following content, replacing `YOUR_XAI_API_KEY` with your actual key:
+
+```
+XAI_API_KEY=YOUR_XAI_API_KEY
+```
+
+## Running the Application
+
+You can run the application either directly using `uvicorn` or by using Docker.
+
+### Running with Uvicorn (Local Development)
+
+1.  **Ensure your `.env` file is present in the root directory.**
+2.  **Start the backend server:**
 
     ```bash
     uvicorn app.main:app --reload
     ```
 
-2.  **Access the frontend:**
+3.  **Access the frontend:**
 
     Open your web browser and navigate to [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
-## API Endpoints
+### Running with Docker
+
+1.  **Build the Docker image:**
+
+    Navigate to the root directory of the project in your terminal and run:
+
+    ```bash
+    docker build -t press-notes-agent .
+    ```
+
+2.  **Run the Docker container:**
+
+    Ensure your `.env` file is present in the root directory. Then, run the container, mapping the port and loading the environment variables:
+
+    ```bash
+    docker run -p 8000:8000 --name press-notes-app --env-file ./.env press-notes-agent
+    ```
+
+3.  **Access the frontend:**
+
+    Open your web browser and navigate to [http://localhost:8000](http://localhost:8000).
 
 - **`GET /`**: Serves the main HTML page.
 - **`POST /extract-content`**: Extracts content from a list of URLs and returns the extracted articles and a path to the generated PDF.
