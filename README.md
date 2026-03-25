@@ -11,25 +11,57 @@ This project is a FastAPI application that automates the process of creating pre
 
 ## Getting Started
 
-### Prerequisites
+### Local Environment
 
-- Python 3.8+
-- Pip
+This project uses the following local setup flow:
+
+```text
+pyenv -> Python 3.11.9
+      -> .venv
+      -> requirements.txt
+      -> requirements-dev.txt (for tests)
+```
 
 ### Installation
 
-1.  **Clone the repository:**
+1. **Clone the repository:**
 
-    ```bash
-    git clone https://github.com/your-username/press-notes-agent.git
-    cd press-notes-agent
-    ```
+   ```bash
+   git clone https://github.com/your-username/press-notes-agent.git
+   cd press-notes-agent
+   ```
 
-2.  **Install dependencies:**
+2. **Install and select Python 3.11.9 with pyenv:**
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+   ```bash
+   pyenv install 3.11.9
+   pyenv local 3.11.9
+   python --version
+   ```
+
+3. **Create the project virtual environment:**
+
+   ```bash
+   python -m venv .venv
+   ```
+
+4. **Activate the virtual environment:**
+
+   ```bash
+   source .venv/bin/activate
+   ```
+
+5. **Install dependencies from `requirements.txt`:**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+6. **Install development dependencies when you want to run tests:**
+
+   ```bash
+   pip install -r requirements-dev.txt
+   ```
 
 ### Configuration
 
@@ -43,42 +75,43 @@ XAI_API_KEY=YOUR_XAI_API_KEY
 
 ## Running the Application
 
-You can run the application either directly using `uvicorn` or by using Docker.
+1. **Activate the virtual environment if it is not already active:**
 
-### Running with Uvicorn (Local Development)
+   ```bash
+   source .venv/bin/activate
+   ```
 
-1.  **Ensure your `.env` file is present in the root directory.**
-2.  **Start the backend server:**
+2. **Ensure your `.env` file is present in the project root.**
 
-    ```bash
-    uvicorn app.main:app --reload
-    ```
+3. **Start the application:**
 
-3.  **Access the frontend:**
+   ```bash
+   python -m uvicorn app.main:app --reload
+   ```
 
-    Open your web browser and navigate to [http://127.0.0.1:8000](http://127.0.0.1:8000).
+4. **Access the frontend:**
 
-### Running with Docker
+   Open your web browser and navigate to [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
-1.  **Build the Docker image:**
+## Running Tests
 
-    Navigate to the root directory of the project in your terminal and run:
+1. **Activate the virtual environment:**
 
-    ```bash
-    docker build -t press-notes-agent .
-    ```
+   ```bash
+   source .venv/bin/activate
+   ```
 
-2.  **Run the Docker container:**
+2. **Install development dependencies if needed:**
 
-    Ensure your `.env` file is present in the root directory. Then, run the container, mapping the port and loading the environment variables:
+   ```bash
+   pip install -r requirements-dev.txt
+   ```
 
-    ```bash
-    docker run -p 8000:8000 --name press-notes-app --env-file ./.env press-notes-agent
-    ```
+3. **Run the test suite:**
 
-3.  **Access the frontend:**
-
-    Open your web browser and navigate to [http://localhost:8000](http://localhost:8000).
+   ```bash
+   pytest
+   ```
 
 - **`GET /`**: Serves the main HTML page.
 - **`POST /extract-content`**: Extracts content from a list of URLs and returns the extracted articles and a path to the generated PDF.
@@ -116,6 +149,7 @@ You can run the application either directly using `uvicorn` or by using Docker.
 │       └── html_cleaner.py
 ├── Dockerfile
 ├── README.md
+├── requirements-dev.txt
 ├── requirements.txt
 └── tests
     └── __init__.py
