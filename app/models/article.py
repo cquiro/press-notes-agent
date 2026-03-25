@@ -2,7 +2,7 @@ from pydantic import BaseModel, HttpUrl, Field
 from typing import List, Union
 
 class ArticleRequest(BaseModel):
-    urls: List[HttpUrl] = Field(..., max_length=10)
+    urls: List[HttpUrl] = Field(..., min_length=1, max_length=10)
 
 class ArticleContent(BaseModel):
     url: str
